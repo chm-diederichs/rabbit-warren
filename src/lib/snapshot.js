@@ -69,7 +69,7 @@ export async function capture(stashName) {
   const patch = capturePatch(repoRoot)
   const untracked = captureUntracked(repoRoot)
   const links = captureLinks(nodeModulesPath)
-  const modified = lockfilePath ? captureModified(nodeModulesPath, lockfilePath) : []
+  const modified = captureModified(nodeModulesPath, lockfilePath)
 
   const meta = {
     name,
