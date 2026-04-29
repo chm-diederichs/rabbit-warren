@@ -155,7 +155,6 @@ export async function restore(stashName) {
 export function inspect(stashName) {
   const repoRoot = getRepoRoot()
   const slug = makeRepoSlug(repoRoot)
-  const nodeModulesPath = path.join(repoRoot, 'node_modules')
 
   let dir, meta
 
@@ -186,14 +185,12 @@ export function inspect(stashName) {
   if (patch.trim()) stashed.changes = inspectPatch(patch)
 
   const linksPath = path.join(dir, 'node_modules', 'links.json')
-  const links = JSON.parse(fs.readFileSync(linksPath, 'utf8'))
+  const untrackedPath = path.join(dir, 'untracked')
+  const modifiedPath = path.join(dir, 'node_modules', 'modified')
 
-  stashed.links = links
-  stashed.untracked = walkFiles(path.join(dir, 'untracked'), repoRoot, { relativeTo: '' })
-    .map(file => path.relative(path.join(dir, 'untracked'), file))
-
-  stashed.modules = walkFiles(path.join(dir, 'node_modules', 'modified'), nodeModulesPath)
-    .map(file => path.relative(path.join(dir, 'node_modules', 'modified'), file))
+  stashed.links = JSON.parse(fs.readFileSync(linksPath, 'utf8'))
+  stashed.untracked = walkFiles(untrackedPath, untrackedPath)
+  stashed.modules = walkFiles(modifiedPath, modifiedPath)
 
   return stashed
 }
